@@ -5,9 +5,10 @@ import re
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
+nltk.download("punkt", quiet=True)
+nltk.download("punkt_tab", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("wordnet", quiet=True)
 
 with open("Twitter_Tweets.pkl", "rb") as f:
     model = pickle.load(f)

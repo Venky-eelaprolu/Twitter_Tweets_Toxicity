@@ -1,41 +1,39 @@
 import streamlit as st
 import pickle
-import pandas as pd
-import numpy as np
-
-with open("Twitter_Tweets.pkl","rb") as f:
-    model = pickle.load(f)
-
-st.title("Predict Tweet Toxicity")
-
-tweet = st.text_input("Enter Tweet")
-
 import nltk
 import re
-nltk.download("punkt")
-nltk.download("punkt_tab")
-nltk.download("stopwords")
-nltk.download("wordnet")
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-def Clean(text):
-  regex = "[^A-Za-z\s]"
-  text = re.sub(regex," ",text)
-  text = text.lower()
-  tokens = nltk.word_tokenize(text)
-  stop_words = set(stopwords.words('english'))
-  filtered_tokens = [word for word in tokens if word not in stop_words]
-  lemmatized_tokens = [WordNetLemmatizer().lemmatize(token) for token in filtered_tokens]
-  return " ".join(lemmatized_tokens)
+nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("wordnet")
 
-if st.button("Predict Class"):
-    cleaned_text = Clean(tweet)
+with open("Twitter_Tweets.pkl", "rb") as f:
+    model = pickle.load(f)
 
-    result = model.predict([cleaned_text])[0]
+st.title("Tweet Toxicity Predictor")
 
-    if result == 0:
-       st.success("Non Toxic Tweet")
+tweet = st.text_input("Enter Tweet")
+
+def clean_text(text):
+    text = re.sub("[^A-Za-z\s]", " ", text)
+    text = text.lower()
+    tokens = nltk.word_tokenize(text)
+    stop_words = set(stopwords.words("english"))
+    tokens = [w for w in tokens if w not in stop_words]
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(w) for w in tokens]
+    return " ".join(tokens)
+
+if st.button("Predict"):
+    if tweet.strip() == "":
+        st.warning("Enter a tweet")
     else:
-       st.error("Toxic Tweet")
-    
+        cleaned = clean_text(tweet)
+        result = model.predict([cleaned])[0]
+
+        if result == 0:
+            st.success("Non-Toxic Tweet")
+        else:
+            st.error("Toxic Tweet")
